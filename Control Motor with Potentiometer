@@ -1,0 +1,20 @@
+#include <ESP8266WiFi.h>
+
+const int motorPin = 2; // Pin untuk motor
+const int potPin = A0;   // Pin untuk potensiometer
+
+void setup() {
+  pinMode(motorPin, OUTPUT);
+  Serial.begin(115200);
+}
+
+void loop() {
+  int potValue = analogRead(potPin); // Membaca nilai potensiometer
+  int motorSpeed = map(potValue, 0, 1023, 0, 255); // Mengonversi nilai potensiometer ke nilai PWM
+  analogWrite(motorPin, motorSpeed); // Mengatur kecepatan motor
+  Serial.print("Potentiometer Value: ");
+  Serial.print(potValue);
+  Serial.print(" Motor Speed: ");
+  Serial.println(motorSpeed);
+  delay(100);
+}
