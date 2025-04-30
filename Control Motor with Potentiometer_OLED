@@ -1,0 +1,70 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 32
+#define OLED_RESET -1
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+const int motorPin = 2;  // GPIO4
+const int potPin = A0;    // Pin potensiometer
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(motorPin, OUTPUT);
+  
+  // Inisialisasi OLED
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("OLED gagal inisialisasi"));
+    while(1);
+  }
+  
+  display.clearDisplay();
+  display.setTextSize(1);  // Ukuran teks lebih kecil untuk muat 4 baris
+  display.setTextColor(WHITE);
+  display.display();
+}
+
+void loop() {
+  int potValue = analogRead(potPin);
+  int motorSpeed = map(potValue, 0, 1023, 0, 255);
+  int potPercent = map(potValue, 0, 1023, 0, 100);
+  int pwmPercent = map(motorSpeed, 0, 255, 0, 100);
+  
+  analogWrite(motorPin, motorSpeed);
+  
+  // Tampilkan di OLED
+  display.clearDisplay();
+  
+  // Baris 1: Nilai POT
+  display.setCursor(0, 0);
+  display.print("POT: ");
+  display.print(potValue);
+  display.print(" (");
+  display.print(potPercent);
+  display.println("%)");
+  
+  // Baris 2: Nilai PWM
+  display.setCursor(0, 16);
+  display.print("PWM: ");
+  display.print(motorSpeed);
+  display.print(" (");
+  display.print(pwmPercent);
+  display.println("%)");
+  
+  display.display();
+  
+  // Tampilkan di Serial Monitor untuk debugging
+  Serial.print("POT: ");
+  Serial.print(potValue);
+  Serial.print(" (");
+  Serial.print(potPercent);
+  Serial.print("%) | PWM: ");
+  Serial.print(motorSpeed);
+  Serial.print(" (");
+  Serial.print(pwmPercent);
+  Serial.println("%)");
+  
+  delay(100);
+}
